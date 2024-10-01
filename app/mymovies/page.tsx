@@ -1,6 +1,7 @@
 'use client';
 
 import { useMovies } from '../providers/MyMoviesProvider';
+import { getMoviePosterUrl } from '../utils/movieUtils';
 
 const MyMoviesPage = () => {
     const { myMovies, removeMovie } = useMovies();
@@ -15,7 +16,7 @@ const MyMoviesPage = () => {
                     {myMovies.map(movie => (
                         <li key={movie.id}>
                             <img
-                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                src={getMoviePosterUrl(movie.poster_path)}
                                 alt={movie.title}
                                 className="w-full h-80 object-cover"
                             />

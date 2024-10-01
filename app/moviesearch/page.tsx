@@ -2,36 +2,36 @@
 
 import { useEffect, useState } from 'react';
 
-import FilmCarousel from '../components/FilmCarousel';
-import { fetchGenres, fetchMoviesByGenres } from '../api/movies';
+import MovieCarousel from '../components/MovieCarousel';
+import { fetchGenres, fetchMoviesByGenres } from '../api/tmdb';
 import { GenreType } from '../types/genre';
+import { MovieType } from '../types/movie';
 
-const FilmSearchPage = () => {
+export default function MovieSearchPage() {
     const [categories, setCategories] = useState<GenreType[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-    const [films, setFilms] = useState<any[]>([]);
+    const [moviesList, setMoviesList] = useState<MovieType[]>([]);
+
+    const isCategoriesListEmpty = categories.length === 0;
+    const searchButtonDisabled = selectedCategories.length === 0;
 
     useEffect(() => {
-        if (categories.length > 0) return;
+        if (!isCategoriesListEmpty) return;
 
-        fetchGenres()
-            .then(genres => {
-                setCategories(genres);
-            })
-            .catch(error => {
-                console.error('Error fetching genres:', error);
-            });
+        fetchGenres().then(genres => {
+            setCategories(genres);
+        });
     }, []);
 
-    const handleCategoryChange = (id: number) => {
+    const handleCategoryChange = (id: number) => () => {
         setSelectedCategories(prev =>
             prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
         );
     };
 
-    const searchFilms = async () => {
+    const searchMovies = async () => {
         const moviesList = await fetchMoviesByGenres(selectedCategories);
-        setFilms(moviesList);
+        setMoviesList(moviesList);
     };
 
     return (
@@ -43,16 +43,18 @@ const FilmSearchPage = () => {
                         <input
                             type="checkbox"
                             value={category.id}
-                            onChange={() => handleCategoryChange(category.id)}
+                            onChange={handleCategoryChange(category.id)}
                         />
                         {category.name}
                     </label>
                 ))}
             </div>
-            <button onClick={searchFilms}>Search Films</button>
-            {films.length > 0 && <FilmCarousel films={films} />}
+
+            <button onClick={searchMovies} disabled={searchButtonDisabled}>
+                Search Movies
+            </button>
+
+            {moviesList.length > 0 && <MovieCarousel movies={moviesList} />}
         </div>
     );
-};
-
-export default FilmSearchPage;
+}

@@ -3,16 +3,21 @@
 import { useState } from 'react';
 import { MovieType } from '../types/movie';
 import { useMovies } from '../providers/MyMoviesProvider';
+import { getMoviePosterUrl } from '../utils/movieUtils';
 
-export default function FilmCarousel({ films }: { films: MovieType[] }) {
+type MovieCarouselProps = {
+    movies: MovieType[];
+};
+
+export default function MovieCarousel({ movies }: MovieCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const currentFilm = films[currentIndex];
+    const currentMovie = movies[currentIndex];
 
     const { addMovie } = useMovies();
 
     const handleLike = () => {
-        addMovie(currentFilm);
+        addMovie(currentMovie);
         nextFilm();
     };
 
@@ -21,28 +26,28 @@ export default function FilmCarousel({ films }: { films: MovieType[] }) {
     };
 
     const nextFilm = () => {
-        if (currentIndex < films.length - 1) {
+        if (currentIndex < movies.length - 1) {
             setCurrentIndex(currentIndex + 1);
         } else {
-            alert('No more films to show!');
+            alert('No more movies to show!');
         }
     };
 
     return (
         <div className="flex flex-col items-center">
-            {currentFilm ? (
+            {currentMovie ? (
                 <div className="max-w-sm w-full bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden mb-8">
                     <img
-                        src={`https://image.tmdb.org/t/p/w500${currentFilm.poster_path}`}
-                        alt={currentFilm.title}
+                        src={getMoviePosterUrl(currentMovie.poster_path)}
+                        alt={currentMovie.title}
                         className="w-full h-80 object-cover"
                     />
                     <div className="p-4">
                         <h3 className="text-lg font-semibold mb-2">
-                            {currentFilm.title}
+                            {currentMovie.title}
                         </h3>
                         <p className="text-gray-700 mb-4">
-                            {currentFilm.overview}
+                            {currentMovie.overview}
                         </p>
                         <div className="flex justify-between">
                             <button
@@ -61,7 +66,7 @@ export default function FilmCarousel({ films }: { films: MovieType[] }) {
                     </div>
                 </div>
             ) : (
-                <p>No films available</p>
+                <p>No movies available</p>
             )}
         </div>
     );
